@@ -1,4 +1,6 @@
 import javax.swing.*;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class Main extends JFrame {
 
@@ -11,7 +13,9 @@ public class Main extends JFrame {
         //returns the value of the enum when called
         INT_CONSTANTS(int value){this.value = value;}
     }
-    static int currentTime = 0;
+
+    static final Path path = Paths.get("./TIMEDATA.txt"); //path to the txt with all the shit that matters in it
+    static int currentTime = 0; //the current time, rn this is a placeholder later itll be displayed like 00:00
     //initalizes all ui elements
     public static void main(String[] args) {
         final int WINDOW_SIZE = INT_CONSTANTS.WINDOW_SIZE.value;
@@ -58,6 +62,7 @@ public class Main extends JFrame {
         /*so what im cooking up is that u click a button to collect every time of day like pokemon cards like u gotta get 5:00 and 5:01 and 5:02 yeah yeah yeah
         so the main menu displays the time and the times youve currently collected by reading off a txt file
         and when that's done u can also make a counter of all the ones u have vs how many you need and a list of the ones you dont have
+        dont include seconds tho thatd be tedious AF bro
          */
         componentInit(panel);
     }
