@@ -1,6 +1,16 @@
 import javax.swing.*;
+import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Scanner;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 public class Main extends JFrame {
 
@@ -14,12 +24,23 @@ public class Main extends JFrame {
         INT_CONSTANTS(int value){this.value = value;}
     }
 
-    static final Path path = Paths.get("./TIMEDATA.txt"); //path to the txt with all the shit that matters in it
-    static int currentTime = 0; //the current time, rn this is a placeholder later itll be displayed like 00:00
-    //initalizes all ui elements
-    public static void main(String[] args) {
+    //initalizes all ui elements and generally does initial setup
+    public static void main(String[] args) throws IOException {
+        final DateTimeFormatter timeFormat = DateTimeFormatter.ofPattern("HH:mm"); //truncates all values that isnt hours and minutes
+        TimeComponent currentTime = new TimeComponent(0,0,(timeFormat.format(LocalTime.now())));  //the current time WOAAAHH :EXPLODING HEAD EMOTE:
         final int WINDOW_SIZE = INT_CONSTANTS.WINDOW_SIZE.value;
         final int BOUNDS = INT_CONSTANTS.BOUNDS.value;
+        final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1); //this will schedule methods to run repeatedly on a delay like the one that updates the current date/time every second
+
+        //changes theme to old people windows
+        try{
+            for (UIManager.LookAndFeelInfo info : UIManager.getInstalledLookAndFeels()) {
+                if ("Windows Classic".equals(info.getName())) {
+                    UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        }catch (Exception e) {System.out.println("error with look and feel!\n------DETAILS------\n"+e.getMessage());}
 
         //the JFrame is the window itself. nothing is added to it except for the panel
         JFrame frame = new JFrame("Time of Day Collector");
@@ -34,19 +55,23 @@ public class Main extends JFrame {
         panel.setLayout(null); //this is set to null so you can directly specify the x/y values of elements instead of using a manager
         frame.add(panel);
 
-        //this displays all the collected times. it uses a txt file to read and save times.
-        JScrollPane collectedTimesList = new JScrollPane();
+        //this is the panel that collected times are added to: it uses a txt file to read and save times
+        JPanel collectedTimesPanel = new JPanel();
+        collectedTimesPanel.setLayout(new BoxLayout(collectedTimesPanel, BoxLayout.Y_AXIS)); //allows times to be added as individual boxes
+
+        //this displays all the collected times in a scrollable format
+        JScrollPane collectedTimesList = new JScrollPane(collectedTimesPanel);
         collectedTimesList.setBounds(WINDOW_SIZE/2, BOUNDS, (WINDOW_SIZE/2)-BOUNDS, WINDOW_SIZE-(BOUNDS*3)); //bounds has to be multiplied by 3 because the y value pos is already offset by the bounds, so the size has to be even smaller to compensate
         panel.add(collectedTimesList);
 
         //this is just for visuals
         JLabel collectedTimesTitle = new JLabel("Collected times");
-        collectedTimesTitle.setBounds((int) ((collectedTimesList.getWidth())+BOUNDS*3.5), 0, WINDOW_SIZE/5, WINDOW_SIZE/10);
+        collectedTimesTitle.setBounds((int) ((collectedTimesList.getWidth())+BOUNDS*3.5), -BOUNDS/3, WINDOW_SIZE/5, WINDOW_SIZE/10);
         panel.add(collectedTimesTitle);
 
         //displays current time (update this every second maybe? every 30 seconds if there's performance issues)
         JLabel currentTimeDisplay = new JLabel("Current Time: "+currentTime);
-        currentTimeDisplay.setBounds(collectedTimesTitle.getWidth(), 0, WINDOW_SIZE/5, WINDOW_SIZE/10);
+        currentTimeDisplay.setBounds(collectedTimesTitle.getWidth(), -BOUNDS/3, WINDOW_SIZE/2, WINDOW_SIZE/10);
         panel.add(currentTimeDisplay);
 
         //this is the button u click to actually collect shit
@@ -55,8 +80,11 @@ public class Main extends JFrame {
         panel.add(timeCollectorButton);
 
         //runs when the time collection button is clicked
-        timeCollectorButton.addActionListener(e ->{
-
+        timeCollectorButton.addActionListener(e -> {
+            try{currentTime.addToPanel(collectedTimesPanel);
+            }catch (IOException ex) {throw new RuntimeException(ex);}
+            panel.repaint();
+            panel.revalidate();
         });
 
         /*so what im cooking up is that u click a button to collect every time of day like pokemon cards like u gotta get 5:00 and 5:01 and 5:02 yeah yeah yeah
@@ -64,13 +92,17 @@ public class Main extends JFrame {
         and when that's done u can also make a counter of all the ones u have vs how many you need and a list of the ones you dont have
         dont include seconds tho thatd be tedious AF bro
          */
-        componentInit(panel);
-    }
 
-    //initializes all elements in the panel
-    private static void componentInit(JPanel panel){
-        final int WINDOW_SIZE = INT_CONSTANTS.WINDOW_SIZE.value;
+        //method that gets called every second makes the current time update
+        Runnable refreshCurrentDate = ()->{
+            currentTime.updateAttributes(0,0, timeFormat.format(LocalTime.now())); //gets the current time using the format specified above
+            currentTimeDisplay.setText("Current Time: "+currentTime.full);
+        };
 
+        scheduler.scheduleAtFixedRate(refreshCurrentDate, 0, 1, TimeUnit.SECONDS); //schedules the current time to refresh every second
 
+        new DataReadingInterface(collectedTimesPanel);
+        panel.repaint();
+        panel.revalidate();
     }
 }
