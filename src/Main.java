@@ -87,12 +87,6 @@ public class Main extends JFrame {
             panel.revalidate();
         });
 
-        /*so what im cooking up is that u click a button to collect every time of day like pokemon cards like u gotta get 5:00 and 5:01 and 5:02 yeah yeah yeah
-        so the main menu displays the time and the times youve currently collected by reading off a txt file
-        and when that's done u can also make a counter of all the ones u have vs how many you need and a list of the ones you dont have
-        dont include seconds tho thatd be tedious AF bro
-         */
-
         //method that gets called every second makes the current time update
         Runnable refreshCurrentDate = ()->{
             currentTime.updateAttributes(0,0, timeFormat.format(LocalTime.now())); //gets the current time using the format specified above
