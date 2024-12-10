@@ -82,6 +82,7 @@ public class Main extends JFrame {
         //runs when the time collection button is clicked
         timeCollectorButton.addActionListener(e -> {
             try{currentTime.addToPanel(collectedTimesPanel);
+                System.out.println(currentTime);
             }catch (IOException ex) {throw new RuntimeException(ex);}
             panel.repaint();
             panel.revalidate();
