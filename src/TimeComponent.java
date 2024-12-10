@@ -17,7 +17,6 @@ public class TimeComponent{
             JTextField addedTime = new JTextField(full);
             addedTime.setEditable(false);
             panel.add(addedTime);
-            System.out.println("im being called! addtopanel!");
             timeArrayList.add(full);
         }
     }
