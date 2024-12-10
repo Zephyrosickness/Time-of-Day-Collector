@@ -7,18 +7,18 @@ public class TimeComponent{
     int minute;
     String full; //this is just the full "HH:MM" string
     final private String REGEX_PATTERN = "^([0-9]|0[0-9]|1[0-9]|2[0-3]):[0-5][0-9]?$"; //the regex pattern to make sure that full matches | this could be a local var i guess but thuis makes the code more readable
-    final public ArrayList<TimeComponent> timeArrayList = new ArrayList<>();
+    final public ArrayList<String> timeArrayList = new ArrayList<>();
 
     //formats given string and adds correct attributes
     public TimeComponent(int hour, int minute, String full){if(parameterChecksum(hour,minute,full)){updateAttributes(hour,minute,full);}}
 
     protected void addToPanel(JPanel panel) throws IOException {
-        if(this.objectValidityChecksum()&&!timeArrayList.contains(this)&&!this.full.equals("0:0")){ //any invalid values will default to 0:0 so this is another bandaid fix to the issue of users entering invalid values
+        if(this.objectValidityChecksum()&&!timeArrayList.contains(full)&&!full.equals("0:0")){ //any invalid values will default to 0:0 so this is another bandaid fix to the issue of users entering invalid values
             JTextField addedTime = new JTextField(full);
             addedTime.setEditable(false);
             panel.add(addedTime);
-            timeArrayList.add(this);
-            new DataReadingInterface(this);
+            System.out.println("im being called! addtopanel!");
+            timeArrayList.add(full);
         }
     }
 

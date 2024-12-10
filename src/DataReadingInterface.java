@@ -23,6 +23,7 @@ public class DataReadingInterface {
             String tempFullString = scan.nextLine();
             TimeComponent tempComponent = new TimeComponent(0,0,tempFullString);
             tempComponent.addToPanel(panel);
+            System.out.println("im being called! line 26 in datareadinginterface!");
         }
     }
 
